@@ -131,7 +131,7 @@ print(text)
 # in
 
 weather ="Weather is quite hot now"
-check_if_hot="hot" in weather
+check_if_hot="ot" in weather
 print("Is it hot:",check_if_hot)
 
 
