@@ -80,3 +80,58 @@ print("Data1:",data1)
 print(type(line1))
 print(type(data1))
 
+line2="Hello How are you?"
+data2=line2.split(" ")
+print("Line2:",line2);
+print("Data2",data2)
+print(type(line2))
+print(type(data2))
+
+# Formatted String 
+# format()
+
+line="My name is {} ,my age is {}"
+name="Zartab"
+age=36
+
+fline=line.format(name,age)
+
+print("O:",line)
+print("F:",fline)
+
+other_line=f"My name is {name}, my age is {age}"
+print("Other Line:",other_line)
+
+# numbered and named formatting
+
+line="{0} {1} sat on a wall, {0} {1} had a great fall"
+fline=line.format("Humpty","Dumpty")
+print("F:",fline)
+
+line="{person1} {person2} sat on a wall, {person1} {person2} had a great fall"
+fline=line.format(person1="Humpty",person2="Dumpty")
+print("F:",fline)
+
+# Escape Characters
+
+# \n -- New Line
+# \t -- Tab
+# \\ -- backslash
+#  \" -- double quotes 
+
+text ="This is a backslash \\"
+print(text)
+
+text ="These are twobackslashes \\\\"
+print(text)
+
+text="I work for \" Neueda \" "
+print(text)
+
+# in
+
+weather ="Weather is quite hot now"
+check_if_hot="hot" in weather
+print("Is it hot:",check_if_hot)
+
+
