@@ -79,3 +79,15 @@ print("M:",squared_numbers)
 # (Name,Price,Qty)  ---> (Name,Price,Qty,Total)
 cart=[('Bread',15,2),('Butter',7,3),('Eggs',3,1)]
 
+def add_total_price(cart_item):
+    name,price,qty=cart_item
+    total=price*qty
+    return (name,price,qty,total)
+
+cart_with_total=list(map(add_total_price,cart))
+
+print("Cart with Total:",cart_with_total)
+
+print("-"*30)
+
+
