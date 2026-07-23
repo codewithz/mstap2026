@@ -20,6 +20,9 @@ public class AbstractRunner {
         m1.makeCall();
         m1.sendSMS();
 
+        System.out.println("Super class for IPhone"+iphone.getClass().getSuperclass());
+        System.out.println("Super class for Mobile"+m.getClass().getSuperclass());
+
 
 
 
