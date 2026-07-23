@@ -1,0 +1,5 @@
+Create a new checked exception, InvalidClaimAmountException, extending Exception, with a constructor that takes a String message.
+In ExpenseClaim, update submit() to also throw this new exception if amount <= 0 — check this before the existing receipt check.
+Update the throws clause on submit() to declare both exceptions, comma-separated.
+In main, add a catch block for InvalidClaimAmountException before your existing MissingReceiptException catch block (think about why the order here doesn't actually matter, unlike the Exception/ArithmeticException example above — these two exceptions aren't related to each other by inheritance).
+Test it with a claim of amount = -10, confirming your new exception fires instead of the receipt one.
