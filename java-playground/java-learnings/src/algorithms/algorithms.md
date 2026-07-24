@@ -13,6 +13,13 @@ different kinds of information:
 - **🔁 ANALOGY** — connects the code back to something familiar
 - **✅ TRY THIS** — a small experiment worth running yourself
 
+> 📊 **Note on diagrams:** this workbook includes several Mermaid
+> diagrams (flowcharts and a chart). They render automatically on
+> GitHub and in VS Code (with the built-in preview or the "Markdown
+> Preview Mermaid Support" extension). If your viewer doesn't support
+> them, every diagram has a matching ASCII trace or code block right
+> next to it, so nothing here depends on the diagram alone.
+
 ---
 
 ## Big O Notation
@@ -75,6 +82,18 @@ Halving the problem each step → think `O(log n)`. That single habit
 gets you most of the way to reading Big O off real code without
 memorising formulas.
 
+**🧭 Diagram: reading Big O off code — quick decision guide**
+
+```mermaid
+flowchart TD
+    A[Look at the loops in the code] --> B{How many loops<br/>touch the data?}
+    B -->|No loop -<br/>direct access| C["O(1) - Constant"]
+    B -->|One loop that halves<br/>the problem each step| D["O(log n) - Logarithmic"]
+    B -->|One loop over<br/>all n items| E["O(n) - Linear"]
+    B -->|One loop, and inside it<br/>a divide-and-conquer split| F["O(n log n) - Linearithmic"]
+    B -->|A loop nested inside<br/>another loop, same data| G["O(n^2) - Quadratic"]
+```
+
 ### Seeing the growth for real numbers
 
 | n | O(1) | O(log n) | O(n) | O(n log n) | O(n²) |
@@ -87,6 +106,25 @@ memorising formulas.
 At `n = 10` the gap between `O(n)` and `O(n²)` looks trivial (10 vs.
 100). By `n = 10,000` it's the difference between "instant" and "100
 million operations." The gap doesn't grow steadily — it explodes.
+
+**📊 Diagram: growth comparison — O(n) vs. O(n log n) vs. O(n²)**
+
+```mermaid
+xychart-beta
+    title "How operation count grows as n increases"
+    x-axis [10, 100, 1000, 10000]
+    y-axis "Approx. operations" 0 --> 100000000
+    line "O(n)" [10, 100, 1000, 10000]
+    line "O(n log n)" [33, 664, 9966, 132877]
+    line "O(n^2)" [100, 10000, 1000000, 100000000]
+```
+
+Notice how flat `O(n)` and `O(n log n)` look on this chart — that's
+not a rendering issue, it's the honest picture. Against `O(n²)`'s
+climb to 100 million, even 132,877 operations barely registers. That
+flatness *is* the lesson: on this scale, "fast" algorithms don't just
+look a bit better than `O(n²)`, they look like they're doing almost
+nothing at all.
 
 ### ✅ TRY THIS: watch it happen live
 
@@ -264,6 +302,22 @@ unsorted value bubbles to the end on each pass.
 Then repeat the pass on the remaining unsorted items until a full pass
 makes no swaps — that's the signal the list is sorted.
 
+**🔵 Diagram: Bubble Sort — process flow**
+
+```mermaid
+flowchart TD
+    Start(["Start: unsorted array"]) --> Pass["Begin a pass<br/>i = 0, swapped = false"]
+    Pass --> Compare{"values[i] > values[i+1]?"}
+    Compare -->|Yes| Swap["Swap them<br/>swapped = true"]
+    Compare -->|No| Next
+    Swap --> Next["i = i + 1"]
+    Next --> EndPass{"Reached end of<br/>unsorted section?"}
+    EndPass -->|No| Compare
+    EndPass -->|Yes| AnySwaps{"Any swaps<br/>this pass?"}
+    AnySwaps -->|Yes| Pass
+    AnySwaps -->|No| Done(["Done: array is sorted"])
+```
+
 ```java
 import java.util.Arrays;
 
@@ -336,6 +390,19 @@ repeat for each position.
 [1, 5, 4, 2]   place 1 at the front; next smallest is 2
 [1, 2, 4, 5]   place 2 next; the remaining values are already in order
 [1, 2, 4, 5]   sorted ✓
+```
+
+**🟢 Diagram: Selection Sort — process flow**
+
+```mermaid
+flowchart TD
+    Start(["Start: unsorted array"]) --> Outer["Position i = 0"]
+    Outer --> Find["Scan positions i..end<br/>for the smallest value"]
+    Find --> SwapMin["Swap smallest value<br/>into position i"]
+    SwapMin --> IncI["i = i + 1"]
+    IncI --> Check{"Reached the<br/>last position?"}
+    Check -->|No| Find
+    Check -->|Yes| Done(["Done: array is sorted"])
 ```
 
 ```java
@@ -413,6 +480,22 @@ already sorted.
 [1, 2, 4, 5]   sorted ✓
 ```
 
+**🟡 Diagram: Insertion Sort — process flow**
+
+```mermaid
+flowchart TD
+    Start(["Start: unsorted array"]) --> Outer["i = 1"]
+    Outer --> Pick["current = values[i]<br/>j = i - 1"]
+    Pick --> ShiftCheck{"j >= 0 AND<br/>values[j] > current?"}
+    ShiftCheck -->|Yes| Shift["Shift values[j] right<br/>j = j - 1"]
+    Shift --> ShiftCheck
+    ShiftCheck -->|No| Insert["Insert current<br/>at position j + 1"]
+    Insert --> IncI["i = i + 1"]
+    IncI --> Check{"Reached end<br/>of array?"}
+    Check -->|No| Pick
+    Check -->|Yes| Done(["Done: array is sorted"])
+```
+
 ```java
 import java.util.Arrays;
 
@@ -471,17 +554,354 @@ current` will be false immediately every time, so the algorithm does
 almost no work. This is why insertion sort is described as "fast on
 nearly-sorted data" — its best case is `O(n)`, not `O(n²)`.
 
-### Faster sorts (for context)
+## Faster Sorts
 
-| Algorithm | Average | Worst case | Notes |
-|---|---|---|---|
-| Bubble | `O(n²)` | `O(n²)` | Simple but slow |
-| Insertion | `O(n²)` | `O(n²)` | Fast on nearly-sorted data |
-| Merge | `O(n log n)` | `O(n log n)` | Stable; uses extra memory |
-| Quick | `O(n log n)` | `O(n²)` | Fast in practice; sorts in place |
-| Tim | `O(n log n)` | `O(n log n)` | Adaptive hybrid; **the default in Java** — a hybrid of Merge and Insertion sort, optimised for real-world (partly-sorted) data |
+Bubble, selection, and insertion sort are all `O(n²)` — great for
+learning how sorting works, but they fall apart on large data. The
+three sorts below are what you'd actually reach for (or, in Tim
+Sort's case, what Java reaches for *automatically*) once performance
+matters.
 
+### Merge sort
 
+🔁 **ANALOGY:** splitting a stack of exam papers in half, then in half
+again, until each pile has one paper — then merging pairs of piles
+back together *in order*, all the way back up.
+
+**How it works:** split the array into two halves, recursively sort
+each half, then merge the two sorted halves back into one sorted
+array. The "hard work" all happens in the merge step — combining two
+already-sorted lists into one is cheap and predictable.
+
+```
+Split:  [5, 1, 4, 2]  →  [5, 1]  and  [4, 2]
+Split again:  [5] [1]  and  [4] [2]   (single items — already "sorted")
+Merge:  [5] + [1] → [1, 5]        [4] + [2] → [2, 4]
+Merge:  [1, 5] + [2, 4] → [1, 2, 4, 5]
+```
+
+Here's the exact same process as a tree — split going down, merge
+coming back up:
+
+**🟣 Diagram: Merge Sort — recursion tree for [5, 1, 4, 2]**
+
+```mermaid
+flowchart TD
+    A["[5, 1, 4, 2]"] --> B["[5, 1]"]
+    A --> C["[4, 2]"]
+    B --> D["[5]"]
+    B --> E["[1]"]
+    C --> F["[4]"]
+    C --> G["[2]"]
+    D --> H["merge -> [1, 5]"]
+    E --> H
+    F --> I["merge -> [2, 4]"]
+    G --> I
+    H --> J["merge -> [1, 2, 4, 5]"]
+    I --> J
+```
+
+```java
+import java.util.Arrays;
+
+public class MergeSortDemo {
+    public static void main(String[] args) {
+        int[] values = {5, 1, 4, 2};
+        System.out.println("Before: " + Arrays.toString(values));
+        mergeSort(values, 0, values.length - 1);
+        System.out.println("After: " + Arrays.toString(values));
+    }
+
+    // 💡 WHY: this is the "split" half of divide-and-conquer. `left` and
+    // `right` mark the section of the array we're currently sorting —
+    // we never create new arrays for the splitting itself, just track
+    // index boundaries.
+    static void mergeSort(int[] values, int left, int right) {
+        // ⚠️ GOTCHA: this is the recursion's base case. A section with
+        // 0 or 1 items is trivially sorted already — without this check,
+        // the recursion would never stop.
+        if (left >= right) return;
+
+        int mid = (left + right) / 2;
+        mergeSort(values, left, mid);       // sort the left half
+        mergeSort(values, mid + 1, right);  // sort the right half
+        merge(values, left, mid, right);    // combine the two sorted halves
+        System.out.println("Merged [" + left + ".." + right + "]: " + Arrays.toString(values));
+    }
+
+    // 💡 WHY: this is the "conquer" half — combining two already-sorted
+    // sections into one sorted section. This is the only place actual
+    // comparisons and reordering happen.
+    static void merge(int[] values, int left, int mid, int right) {
+        int[] leftHalf = Arrays.copyOfRange(values, left, mid + 1);
+        int[] rightHalf = Arrays.copyOfRange(values, mid + 1, right + 1);
+
+        int i = 0, j = 0, k = left;
+        // 💡 WHY: since both halves are already sorted, we only ever
+        // need to compare their current front elements — the smaller
+        // one is guaranteed to be the next smallest value overall.
+        while (i < leftHalf.length && j < rightHalf.length) {
+            if (leftHalf[i] <= rightHalf[j]) {
+                values[k++] = leftHalf[i++];
+            } else {
+                values[k++] = rightHalf[j++];
+            }
+        }
+        // ⚠️ GOTCHA: one of these two loops will run and the other
+        // won't — once one half runs out, the remainder of the other
+        // half is already in order, so it just gets copied across.
+        while (i < leftHalf.length) values[k++] = leftHalf[i++];
+        while (j < rightHalf.length) values[k++] = rightHalf[j++];
+    }
+}
+```
+
+```
+# Output:
+Before: [5, 1, 4, 2]
+Merged [0..1]: [1, 5, 4, 2]
+Merged [2..3]: [1, 5, 2, 4]
+Merged [0..3]: [1, 2, 4, 5]
+After: [1, 2, 4, 5]
+```
+
+⚠️ **GOTCHA:** merge sort needs the temporary `leftHalf` / `rightHalf`
+arrays created inside `merge()`. That's why its space complexity is
+`O(n)` — it's not sorting fully "in place" the way the `O(n²)` sorts
+were. That extra memory is the price paid for guaranteed `O(n log n)`
+performance, even in the worst case.
+
+### Quick sort
+
+🔁 **ANALOGY:** picking one person in a queue as a reference point,
+moving everyone shorter than them to one side and everyone taller to
+the other, then repeating that same trick separately on each side.
+
+**How it works:** pick a **pivot** value, rearrange the array so
+everything smaller than the pivot ends up on its left and everything
+larger ends up on its right (this step is called *partitioning*), then
+recursively apply the same process to the left and right sections.
+Unlike merge sort, quick sort does its work *before* recursing, and
+sorts in place — no extra arrays needed.
+
+```java
+import java.util.Arrays;
+
+public class QuickSortDemo {
+    public static void main(String[] args) {
+        int[] values = {5, 1, 4, 2};
+        System.out.println("Before: " + Arrays.toString(values));
+        quickSort(values, 0, values.length - 1);
+        System.out.println("After: " + Arrays.toString(values));
+    }
+
+    static void quickSort(int[] values, int low, int high) {
+        if (low >= high) return; // base case: 0 or 1 items is already sorted
+
+        // 💡 WHY: partition() does the real work — reordering the
+        // section so the pivot lands in its final sorted position —
+        // and tells us exactly where that position is.
+        int pivotIndex = partition(values, low, high);
+        quickSort(values, low, pivotIndex - 1);   // everything smaller than the pivot
+        quickSort(values, pivotIndex + 1, high);  // everything bigger than the pivot
+    }
+
+    static int partition(int[] values, int low, int high) {
+        // ⚠️ GOTCHA: this implementation always picks the *last*
+        // element in the section as the pivot. Simple, but it's also
+        // exactly what causes quick sort's O(n²) worst case on data
+        // that's already sorted (or reverse-sorted) — see the
+        // Trade-offs section below.
+        int pivot = values[high];
+        int i = low - 1; // tracks the boundary of the "smaller than pivot" region
+
+        for (int j = low; j < high; j++) {
+            if (values[j] < pivot) {
+                i++;
+                swap(values, i, j);
+            }
+        }
+        swap(values, i + 1, high); // move the pivot into its final sorted position
+        System.out.println("Partitioned around " + pivot + ": " + Arrays.toString(values));
+        return i + 1;
+    }
+
+    static void swap(int[] values, int a, int b) {
+        int temp = values[a];
+        values[a] = values[b];
+        values[b] = temp;
+    }
+}
+```
+
+```
+# Output:
+Before: [5, 1, 4, 2]
+Partitioned around 2: [1, 2, 4, 5]
+Partitioned around 5: [1, 2, 4, 5]
+After: [1, 2, 4, 5]
+```
+
+And the same run as a partition tree — this is the actual sequence
+the verified output above produced, not a simplified version:
+
+**🟠 Diagram: Quick Sort — partition tree for [5, 1, 4, 2]**
+
+```mermaid
+flowchart TD
+    A["Partition [5, 1, 4, 2]<br/>pivot = 2 -> [1, 2, 4, 5]"] --> B["Left: [1]<br/>(base case)"]
+    A --> C["Right: [4, 5]<br/>Partition, pivot = 5"]
+    C --> D["Left: [4]<br/>(base case)"]
+    C --> E["Right: empty<br/>(base case)"]
+```
+
+✅ **TRY THIS:** trace `partition()` by hand on paper for
+`[5, 1, 4, 2]` — pivot is `2` (the last element). Walk `j` from `0` to
+`2` and track `i`: does `values[j] < 2` ever trigger before `j`
+reaches an element smaller than 2? Confirming this by hand is the
+best way to actually understand what "partitioning" means, rather
+than just watching the printed output.
+
+### Tim sort
+
+🔁 **ANALOGY:** a librarian who notices some shelves are already
+mostly in order and barely touches them, while completely
+re-shelving the messy ones — rather than re-sorting every single
+shelf from scratch regardless of how tidy it already was.
+
+**How it works:** Tim Sort is a hybrid of merge sort and insertion
+sort. It scans the data for naturally-occurring sorted stretches
+("runs"), uses fast insertion sort to tidy up any short unsorted
+stretches into runs of a minimum length, and then merges the runs
+together using the same merge step as merge sort. Because real-world
+data is very often partially sorted already (think: a list of orders
+sorted by date, with a few rows updated out of order), Tim Sort
+exploits that instead of ignoring it.
+
+You won't hand-write Tim Sort — it's genuinely complex, hundreds of
+lines in the JDK source. What matters is knowing it's **already
+running** every time you call `Collections.sort()` on a `List`, or
+`Arrays.sort()` on an array of objects (not primitives — more on that
+distinction in Part 2). The best way to *see* it in action is to watch
+its adaptive behaviour for yourself:
+
+```java
+import java.util.*;
+
+public class TimSortDemo {
+    public static void main(String[] args) {
+        int n = 2_000_000;
+
+        // Fully random data
+        Integer[] randomData = new Integer[n];
+        Random rnd = new Random(42);
+        for (int i = 0; i < n; i++) randomData[i] = rnd.nextInt();
+
+        // 💡 WHY: build data that's sorted except for a handful of
+        // elements swapped out of place — this simulates the kind of
+        // "mostly sorted, slightly messy" data Tim Sort is designed for.
+        Integer[] nearlySortedData = new Integer[n];
+        for (int i = 0; i < n; i++) nearlySortedData[i] = i;
+        for (int i = 0; i < 50; i++) {
+            int a = rnd.nextInt(n);
+            int b = rnd.nextInt(n);
+            Integer temp = nearlySortedData[a];
+            nearlySortedData[a] = nearlySortedData[b];
+            nearlySortedData[b] = temp;
+        }
+
+        long start1 = System.nanoTime();
+        Arrays.sort(randomData); // ⚠️ GOTCHA: Integer[] (boxed), not int[] —
+        long end1 = System.nanoTime();          // this is what makes it Tim Sort
+
+        long start2 = System.nanoTime();
+        Arrays.sort(nearlySortedData);
+        long end2 = System.nanoTime();
+
+        System.out.println("Random data:         " + (end1 - start1) / 1_000_000 + " ms");
+        System.out.println("Nearly-sorted data:   " + (end2 - start2) / 1_000_000 + " ms");
+    }
+}
+```
+
+```
+# Output (yours will vary, but the gap will be dramatic either way):
+Random data:         1516 ms
+Nearly-sorted data:   31 ms
+```
+
+That's roughly a **50x difference** sorting the exact same *amount*
+of data — the only thing that changed is how sorted it already was.
+Merge sort and quick sort don't get anywhere near this benefit; Tim
+Sort's whole design is built around noticing and exploiting exactly
+this situation, which is why it's the default.
+
+---
+
+## Trade-offs
+
+| Algorithm | Average | Worst case | Space | Stable? | Notes |
+|---|---|---|---|---|---|
+| Bubble | `O(n²)` | `O(n²)` | `O(1)` | Yes | Simple but slow; mainly for teaching |
+| Selection | `O(n²)` | `O(n²)` | `O(1)` | No | Minimises swaps, not comparisons |
+| Insertion | `O(n²)` | `O(n²)` | `O(1)` | Yes | Fast — close to `O(n)` — on nearly-sorted data |
+| Merge | `O(n log n)` | `O(n log n)` | `O(n)` | Yes | Predictable, but always pays the extra memory cost |
+| Quick | `O(n log n)` | `O(n²)` | `O(log n)` | No | Fast in practice; worst case hits on already-sorted/reverse-sorted data with a naive pivot |
+| Tim | `O(n log n)` | `O(n log n)` | `O(n)` | Yes | Adaptive; the default in Java for objects |
+
+A couple of terms in that table worth explaining if they're new:
+
+- **Stable** means equal elements keep their original relative order
+  after sorting. This matters more than it sounds: imagine sorting a
+  list of employees by department, when the list was already sorted
+  by name — a stable sort keeps each department's employees in
+  alphabetical order; an unstable sort might shuffle them.
+- **Space** here means *extra* memory beyond the input itself. `O(1)`
+  sorts rearrange the array in place; `O(n)` sorts need a full second
+  array's worth of memory at some point during the process.
+
+**Why quick sort's worst case matters in practice:** the simple
+"always pick the last element" pivot strategy used above performs
+badly — `O(n²)` — on data that's already sorted or reverse-sorted,
+because every partition step ends up putting almost everything on
+one side. Production implementations avoid this with smarter pivot
+selection (e.g. picking the median of three sample elements, or
+picking randomly), which makes the worst case vanishingly rare in
+practice without changing the underlying idea.
+
+## Quick cheat sheet: which one do I reach for?
+
+- **Writing real Java code, not implementing a sort yourself?**
+  Just call `Collections.sort()` or `Arrays.sort()`. You get Tim Sort
+  (objects) or a dual-pivot quicksort (primitives) for free, both
+  well-tested and fast. This covers the overwhelming majority of
+  real situations.
+- **Data is already mostly sorted, or you expect it to be?** This is
+  exactly what Tim Sort is built for — which, again, is just the
+  built-in `Collections.sort()` / `Arrays.sort()`. No special action
+  needed; Java already does the right thing.
+- **You need a guaranteed worst case, no exceptions** (e.g. a
+  real-time system where an occasional `O(n²)` stall is unacceptable)?
+  Reach for merge sort's `O(n log n)` guarantee, and accept the extra
+  memory cost as the trade-off.
+- **Memory is tight and you can't afford a second array?** Quick sort
+  sorts in place with only `O(log n)` extra space for recursion,
+  against merge sort's full `O(n)` copy. Just be aware of its
+  worst-case risk on adversarial or already-sorted input.
+- **You need equal elements to keep their original order** (stability
+  matters — e.g. sorting by one column after already sorting by
+  another)? Reach for insertion sort, merge sort, or Tim Sort — not
+  quick sort or selection sort, which don't guarantee it.
+- **The data set is small** (a rough rule of thumb: under ~50 items)?
+  The `O(n²)` sorts' simplicity often wins in practice — the constant
+  overhead of a more "efficient" algorithm's setup can outweigh its
+  theoretical advantage at tiny sizes. This is actually *part of* why
+  Tim Sort uses insertion sort internally for small runs rather than
+  merging all the way down to single elements.
+- **You're in an interview or exam and asked to implement a sort from
+  scratch?** Merge sort is usually the safest choice to have memorised
+  — its worst case never degrades, and the split/merge logic is easier
+  to reason about under pressure than quick sort's partitioning.
 
 ---
 
