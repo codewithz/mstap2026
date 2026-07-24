@@ -778,6 +778,32 @@ data is very often partially sorted already (think: a list of orders
 sorted by date, with a few rows updated out of order), Tim Sort
 exploits that instead of ignoring it.
 
+**🔴 Diagram: Tim Sort — process flow**
+
+```mermaid
+flowchart TD
+    A(["Start: unsorted array"]) --> B["Scan left to right,<br/>find a naturally ascending<br/>or descending run"]
+    B --> C{"Run shorter than<br/>the minimum run length?"}
+    C -->|Yes| D["Extend it to minrun length<br/>using insertion sort"]
+    C -->|No| E["Keep the run as-is"]
+    D --> F["Push the run<br/>onto a stack of runs"]
+    E --> F
+    F --> G{"More of the array<br/>left to scan?"}
+    G -->|Yes| B
+    G -->|No| H["Merge adjacent runs together,<br/>using the same merge step<br/>as merge sort"]
+    H --> I{"More than one<br/>run remaining?"}
+    I -->|Yes| H
+    I -->|No| J(["Done: array is sorted"])
+```
+
+Notice the two building blocks in that diagram: **insertion sort**
+tidies up the short, messy stretches (it's fast on the small, nearly-
+sorted runs it's given), and **merge sort's merge step** combines the
+already-sorted runs together. That's the "hybrid" in "hybrid of merge
+and insertion sort" made concrete — Tim Sort isn't a third, unrelated
+algorithm, it's the other two working together, applied to whichever
+parts of the data actually need each one.
+
 You won't hand-write Tim Sort — it's genuinely complex, hundreds of
 lines in the JDK source. What matters is knowing it's **already
 running** every time you call `Collections.sort()` on a `List`, or
