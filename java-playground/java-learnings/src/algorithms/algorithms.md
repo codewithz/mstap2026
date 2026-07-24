@@ -481,11 +481,7 @@ nearly-sorted data" — its best case is `O(n)`, not `O(n²)`.
 | Quick | `O(n log n)` | `O(n²)` | Fast in practice; sorts in place |
 | Tim | `O(n log n)` | `O(n log n)` | Adaptive hybrid; **the default in Java** — a hybrid of Merge and Insertion sort, optimised for real-world (partly-sorted) data |
 
-You'll meet Tim Sort properly in the next session, when we cover
-Java's built-in `Collections.sort()` and `Arrays.sort()` — you won't
-often need to hand-write a sort like the three above in real code, but
-understanding how they work makes it much easier to reason about
-*why* the built-in tools behave the way they do.
+
 
 ---
 
