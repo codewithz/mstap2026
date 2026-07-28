@@ -5,7 +5,7 @@
 
 ## Introduction
 
-Locking down accounts and configuring the shared responsibility model correctly (covered in the previous document) is only half the picture. The other half is **visibility** — being able to see exactly who did what, and being alerted automatically when something looks wrong. This document covers the tools cloud providers offer for exactly that: audit logging, AI-driven threat detection, web firewalls, and sensitive-data discovery.
+Locking down accounts and configuring the shared responsibility model correctly (covered in the previous document) is only half the picture. The other half is **visibility** — being able to see exactly who did what, and being alerted automatically when something looks wrong. This document covers the tools cloud providers offer for exactly that: audit logging, AI-driven threat detection, web firewalls, and sensitive-data discovery — opening with a real UK case that shows precisely what goes wrong when identity and access controls are treated as optional.
 
 ---
 
@@ -13,7 +13,7 @@ Locking down accounts and configuring the shared responsibility model correctly 
 
 Cloud providers log every user action automatically: **CloudTrail** on AWS, **Activity Log** on Azure. These record who did what, when, and from where (source IP) — permanently, if configured to keep that history.
 
-**Real-world analogy:** Every console click, every API call, every "who deleted that server?" question has an answer, permanently logged with a timestamp, username, and source IP — assuming logging hasn't been disabled (which is itself a loggable, suspicious action in its own right).
+**Real-world analogy:** Every console click, every API call, every "who deleted that server?" question has an answer, permanently logged with a timestamp, username, and source IP — assuming logging hasn't been disabled (which is itself a loggable, suspicious action in its own right) and assuming, crucially, that the person taking the action was actually logged in as *themselves*.
 
 ```mermaid
 graph LR
@@ -24,7 +24,43 @@ graph LR
     classDef store fill:#A3E4D7,stroke:#17A589,stroke-width:2px,color:#0B5345
 ```
 
-**Why this matters, told through a real incident:** a sacked IT contractor once used a former colleague's login to destroy roughly £500,000 of a former employer's AWS infrastructure — and was later jailed, in large part because the audit trail made it possible to establish exactly what happened and who did it. This is precisely why individual, named IAM users matter so much (see the previous document) — shared logins make an audit trail far less useful, because you can't tell which specific person actually took the action.
+That last caveat is not a minor detail — it's the entire subject of the story below.
+
+### Real-World Story: The Sacked Employee, the Stolen Login, and 23 Deleted Servers
+
+In 2016, a UK digital marketing and software company called Voova learned exactly why individual, named accounts (Section 1 of the previous document) and audit trails matter, in the most painful way possible.
+
+<cite index="188-1">Steffan Needham had spent just four weeks working for Voova before being let go for "below-par performance."</cite> Rather than accepting this, <cite index="188-2">Needham obtained a former colleague's AWS login credentials and used them to methodically terminate the company's AWS servers, destroying what police and prosecutors valued at roughly £500,000 in business-critical data.</cite> <cite index="186-1">Voova lost a number of major contracts as a direct result, was forced to make staff redundant, and the destroyed data was never recovered.</cite>
+
+```mermaid
+sequenceDiagram
+    participant N as Needham (fired employee)
+    participant C as Colleague's stolen login
+    participant AWS as Voova's AWS account
+    participant Log as (No MFA in place)
+
+    N->>C: Obtains stolen credentials
+    Note over Log: No second factor to block the login
+    C->>AWS: Logs in appearing as the colleague
+    AWS->>AWS: 23 servers terminated,<br/>one by one
+    Note over N,AWS: Every action logged under the<br/>colleague's identity, not Needham's
+```
+
+<cite index="182-1">A security expert who testified during the trial was direct about the root cause: Voova had no multi-factor authentication in place — no second means of confirming that the person logging in as a given user genuinely was that person.</cite> <cite index="186-2">Needham was not traced and arrested until roughly ten months after the incident, only after being found working for a different company.</cite> <cite index="188-3">He was ultimately found guilty on two charges under the UK's Computer Misuse Act and sentenced to two years in prison.</cite>
+
+This case is a near-perfect illustration of why the previous document insisted that shared logins undermine audit trails. Every single action Needham took was, from AWS's own logging perspective, technically attributable to his former colleague's account — because that is genuinely whose credentials were used. CloudTrail-style logging tells you *which identity* took an action; it cannot tell you *whether that identity's credentials were stolen*, unless something else — most commonly, multi-factor authentication — makes stolen credentials alone insufficient to log in.
+
+```mermaid
+graph TD
+    Lesson1["👤 Individual, named accounts<br/>make logs meaningful"]:::lesson
+    Lesson2["🔐 MFA stops a stolen<br/>password alone from<br/>being enough"]:::lesson
+    Lesson3["📝 Logs record identity —<br/>they can't detect<br/>impersonation on their own"]:::warning
+
+    classDef lesson fill:#A3E4D7,stroke:#17A589,stroke-width:2px,color:#0B5345
+    classDef warning fill:#F5B7B1,stroke:#C0392B,stroke-width:2px,color:#78281F
+```
+
+The fix, identified explicitly during the trial, wasn't exotic or expensive: multi-factor authentication on every account, which would have required a second confirmation — typically a code sent to the genuine colleague's own phone — before Needham's login attempt could have succeeded at all.
 
 ---
 
@@ -36,20 +72,21 @@ Rather than a human manually reading through thousands of log entries, cloud pro
 - **Azure Advanced Threat Protection** (databases only)
 - **Google Cloud Armor**
 
-**Real-world analogy:** CloudTrail is the building's CCTV footage — it records everything, but someone has to actively watch it. GuardDuty is an AI security guard that watches all the footage simultaneously and taps you on the shoulder the moment something looks wrong, instead of you finding out three weeks later during a routine review.
+**Real-world analogy:** CloudTrail is the building's CCTV footage — it records everything, but someone has to actively watch it. GuardDuty is an AI security guard that watches all the footage simultaneously and taps you on the shoulder the moment something looks wrong, instead of you finding out three weeks later during a routine review — or, as in the Voova case, ten months later.
 
 ```mermaid
 graph TD
     Logs["📼 CloudTrail /<br/>Activity Logs<br/>(everything recorded)"]:::logs --> AI["🤖 AI Threat Detection<br/>(GuardDuty, etc.)"]:::ai
     AI --> Pattern1["Repeated failed logins<br/>from an unusual IP<br/>(brute-force attempt)"]:::alert
     AI --> Pattern2["Someone quietly disabling<br/>logging (covering tracks)"]:::alert
+    AI --> Pattern3["Login pattern inconsistent<br/>with a user's normal<br/>behaviour (e.g. Needham's case)"]:::alert
 
     classDef logs fill:#D5D8DC,stroke:#566573,stroke-width:2px,color:#212F3C
     classDef ai fill:#D2B4DE,stroke:#7D3C98,stroke-width:2px,color:#4A235A
     classDef alert fill:#F5B7B1,stroke:#C0392B,stroke-width:2px,color:#78281F
 ```
 
-Two realistic, common patterns these tools catch: a brute-force login attempt against a server (many failed logins from an unusual location in a short time), and an attempt to cover tracks by quietly disabling logging itself — both recognisable, well-understood attack signatures rather than vague "AI magic."
+Two realistic, common patterns these tools catch: a brute-force login attempt against a server (many failed logins from an unusual location in a short time), and an attempt to cover tracks by quietly disabling logging itself. A third — flagged in the diagram above — is precisely the kind of anomaly modern threat detection tools are designed to catch that a 2016-era manual audit process missed entirely: a login succeeding from an unusual location or at an unusual time for that particular user, even with technically valid credentials.
 
 ---
 
@@ -71,6 +108,8 @@ graph LR
     classDef blocked fill:#F5B7B1,stroke:#C0392B,stroke-width:2px,color:#78281F
     classDef allowed fill:#A3E4D7,stroke:#17A589,stroke-width:2px,color:#0B5345
 ```
+
+It's worth connecting this back to the previous document's Capital One story: a WAF is a genuinely powerful protective tool, but only when it's configured correctly. A misconfigured WAF didn't just fail to protect in that case — it became the entry point for the entire breach. A web firewall reduces risk; it doesn't eliminate the need for every other layer covered in this document series.
 
 ---
 
@@ -113,8 +152,9 @@ Each major provider publishes its own detailed security best-practice framework,
 | GuardDuty / Threat Detection | An AI security guard watching all footage at once | Automated, AI-driven anomaly detection across account activity |
 | Web Application Firewall | A bouncer with a specific rulebook | Rules blocking malicious traffic before it reaches your application |
 | Amazon Macie | A specialist scanning for sensitive documents left in the open | Automated discovery of PII and public exposure risk in storage |
+| The Voova Case, 2016 | A stolen staff keycard with no photo ID check | Logs recorded the wrong identity because no MFA stopped the impersonation |
 
-**In summary:** securing a cloud environment doesn't end at configuration — it requires ongoing visibility. Audit logs like CloudTrail record every action so nothing happens invisibly; AI-driven threat detection tools like GuardDuty watch those logs continuously so a human doesn't have to; web firewalls filter out malicious traffic before it ever reaches an application; and tools like Amazon Macie proactively hunt for sensitive data sitting somewhere it shouldn't be. Together with the account and infrastructure protections covered in the previous document, this completes the full picture of how cloud security actually works in practice — not as a single setting to switch on, but as a layered set of responsibilities and tools working together.
+**In summary:** securing a cloud environment doesn't end at configuration — it requires ongoing visibility. Audit logs like CloudTrail record every action so nothing happens invisibly, but as the Voova case shows in the starkest possible terms, a log is only as trustworthy as the identity behind it — which is exactly why multi-factor authentication and individually-named accounts, introduced in the previous document, matter as much as logging itself. AI-driven threat detection tools like GuardDuty exist precisely to catch the kind of anomaly a purely manual, after-the-fact audit missed for ten months in that case; web firewalls filter out malicious traffic before it ever reaches an application, provided they're configured correctly; and tools like Amazon Macie proactively hunt for sensitive data sitting somewhere it shouldn't be. Together with the account and infrastructure protections covered in the previous document, this completes the full picture of how cloud security actually works in practice — not as a single setting to switch on, but as a layered set of responsibilities and tools working together, each one covering a gap the others don't.
 
 ---
 
