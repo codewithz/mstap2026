@@ -5,7 +5,7 @@
 
 ## Introduction
 
-Once a company has decided to use the cloud, two big decisions remain: **how much of the technology stack should the provider manage, versus you?** And **how should existing applications actually get there?** This document covers both — the IaaS/PaaS/SaaS service models (explained through a pizza analogy that tends to stick permanently once heard), and the main strategies companies use to migrate existing systems into the cloud.
+Once a company has decided to use the cloud, two big decisions remain: **how much of the technology stack should the provider manage, versus you?** And **how should existing applications actually get there?** This document covers both — the IaaS/PaaS/SaaS service models (explained through a pizza analogy that tends to stick permanently once heard), and the main strategies companies use to migrate existing systems into the cloud, illustrated by the same Netflix migration introduced in the previous document.
 
 ---
 
@@ -39,6 +39,8 @@ graph LR
 ```
 
 A quick real-world mapping, so this isn't just theory: EC2 is IaaS. A managed application platform like Elastic Beanstalk is PaaS. Office 365 or Gmail is SaaS. And somewhere beyond even PaaS sits **serverless** (sometimes called **FaaS — Function as a Service**), where you don't manage a server *or* a runtime — just a function that runs when triggered. This gets its own closer look in a later document.
+
+It's worth noticing something these four levels have in common: at every step up this ladder, you trade *control* for *convenience*. Running everything on-prem gives you total control over every layer, at the cost of managing every layer yourself. SaaS gives you almost no control — you can't tweak Gmail's underlying server configuration — in exchange for needing to think about infrastructure at all. Most real organisations don't pick one level for everything; they mix and match depending on what a given application actually needs.
 
 ---
 
@@ -84,7 +86,28 @@ graph TD
     classDef hybrid fill:#AED6F1,stroke:#2E86C1,stroke-width:2px,color:#154360
 ```
 
-None of these three is universally "correct" — the right choice depends entirely on how much time, budget, and cloud expertise is available, and how much of the platform's benefit is actually needed.
+### Real-World Story: Netflix's Choice — Forklift, or Rebuild From Scratch?
+
+The previous document introduced *why* Netflix moved to AWS: a 2008 database corruption that halted DVD shipments for three days. What it didn't cover was *how* — and Netflix's engineering team was remarkably candid about the choice they faced, because it maps almost exactly onto the three strategies above.
+
+The obvious, fastest option was Forklift: pack up the existing systems as-is and drop them onto AWS virtual servers. <cite index="128-5">Netflix's own engineers acknowledged that the easiest way to move to the cloud is to forklift every system, unchanged, straight out of the data centre and onto AWS.</cite> But they also identified the trap in that approach: <cite index="128-6">doing so simply carries every existing problem and limitation of the old data centre along with it, unsolved.</cite> Since the entire point of moving was to escape the single-point-of-failure design that caused the 2008 outage, a Forklift migration would have technically succeeded while leaving the actual underlying risk completely intact.
+
+<cite index="128-7">Instead, Netflix deliberately chose the cloud-native, Leverage approach — rebuilding virtually all of its technology and fundamentally changing how the company operated, rather than simply relocating it.</cite> This is why the migration took as long as it did: not a lift-and-shift weekend project, but a genuine architectural rebuild, spread out over roughly seven years, with the majority of customer-facing systems moved before 2015 and the last remaining data-centre infrastructure — the billing systems — finally retired in <cite index="130-4">early January 2016</cite>.
+
+```mermaid
+graph TD
+    Choice["2008: Netflix must choose<br/>a migration strategy"]:::choice
+    Choice -->|"Considered, rejected"| Forklift["🏗️ Forklift:<br/>fast, but keeps the same<br/>single-point-of-failure risk"]:::rejected
+    Choice -->|"Chosen"| Leverage["🚀 Leverage:<br/>full rebuild,<br/>~7 years, completed 2016"]:::chosen
+
+    classDef choice fill:#FAD7A0,stroke:#B9770E,stroke-width:2px,color:#7E5109
+    classDef rejected fill:#F5B7B1,stroke:#C0392B,stroke-width:2px,color:#78281F
+    classDef chosen fill:#A3E4D7,stroke:#17A589,stroke-width:2px,color:#0B5345
+```
+
+The takeaway isn't that Leverage is always the "correct" choice — for many companies, with less catastrophic motivation and a tighter budget, Forklift is a perfectly sensible first step, and plenty of successful migrations start there before gradually re-architecting piece by piece afterward. Netflix's case is instructive specifically *because* their original problem was architectural, not just physical — no amount of relocating an unchanged single-database design would have fixed the flaw that broke it in the first place.
+
+None of these three strategies is universally "correct" — the right choice depends entirely on how much time, budget, and cloud expertise is available, and how much of the platform's benefit is actually needed.
 
 ---
 
@@ -122,7 +145,7 @@ graph LR
     classDef api fill:#A3E4D7,stroke:#17A589,stroke-width:2px,color:#0B5345
 ```
 
-**Why this matters in practice:** relying on humans clicking through a console at scale reliably produces "fat finger" errors — genuine, well-documented incidents exist of a single misclick sending a company's stock price swinging within seconds. Automation isn't just a nice-to-have; it's what makes cloud infrastructure safe to operate at any real scale.
+**Why this matters in practice:** relying on humans clicking through a console at scale reliably produces "fat finger" errors — genuine, well-documented incidents exist of a single misclick sending a company's stock price swinging within seconds. Automation isn't just a nice-to-have; it's what makes cloud infrastructure safe to operate at any real scale. The next document's real-world story — a single mistyped command that took down a large slice of the internet in 2017 — makes exactly this point, from the cloud provider's own side of the relationship.
 
 ---
 
@@ -137,8 +160,9 @@ graph LR
 | Leverage Migration | Redesigning furniture for the new house | Re-architecting to use cloud-native services fully |
 | Hybrid Migration | Keeping a piano that can't be moved | Some apps/data stay on-prem, linked to the cloud |
 | Console vs. CLI/API | Manual driving vs. autopilot | Manual clicking vs. scriptable, repeatable automation |
+| Netflix, 2008–2016 | Rebuilding the house rather than moving the old furniture in | Rejecting Forklift in favour of a full Leverage rebuild |
 
-**In summary:** IaaS, PaaS, and SaaS describe a sliding scale of how much of the technology stack a provider manages for you, from "just the kitchen" to "a finished pizza." Migrating existing systems into the cloud generally follows one of three strategies — quick-and-simple Forklift, fuller-benefit Leverage, or a Hybrid mix where some things simply can't move — and once there, interacting with the cloud through scriptable tools rather than manual console clicks is what keeps operations safe and repeatable at scale.
+**In summary:** IaaS, PaaS, and SaaS describe a sliding scale of how much of the technology stack a provider manages for you, from "just the kitchen" to "a finished pizza" — and moving up that scale trades control for convenience. Migrating existing systems into the cloud generally follows one of three strategies — quick-and-simple Forklift, fuller-benefit Leverage, or a Hybrid mix where some things simply can't move — and Netflix's own migration shows exactly why the choice matters: a Forklift move would have relocated their 2008 database problem to AWS unchanged, while the Leverage rebuild they actually chose took roughly seven years but solved the underlying architectural flaw for good. Once in the cloud, interacting with it through scriptable tools rather than manual console clicks is what keeps operations safe and repeatable at scale.
 
 ---
 
