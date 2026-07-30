@@ -83,6 +83,59 @@ Verify the system satisfies the actual business requirement — often written co
 
 ---
 
+## 🔁 TDD — Test-Driven Development
+
+TDD flips the usual order of writing code. Instead of writing the feature first and testing it afterwards, you write the test **before** the code exists — and let the test guide what you build. It follows a short, repeating cycle known as **Red → Green → Refactor**:
+
+1. **Red** — write a test for a behaviour that doesn't exist yet. Run it. It fails (there's nothing to make it pass).
+2. **Green** — write the *minimum* amount of code needed to make that test pass. Not the elegant, complete solution — just enough to go green.
+3. **Refactor** — now that you have a passing test protecting you, clean the code up: remove duplication, improve naming, simplify. Re-run the test after every change to confirm you haven't broken anything.
+
+```python
+# Red: write this test first — Calculator doesn't even exist yet
+def test_add_two_numbers():
+    calculator = Calculator()
+    assert calculator.add(2, 3) == 5
+```
+
+Only *after* seeing this fail do you write `Calculator` and its `add` method — writing just enough to make the test pass, then refactoring.
+
+**🔴 Diagram: TDD — Red, Green, Refactor cycle**
+
+```mermaid
+flowchart LR
+    A["🔴 RED<br/>Write a failing test<br/>for behaviour that doesn't exist yet"] --> B["🟢 GREEN<br/>Write the minimum code<br/>needed to pass the test"]
+    B --> C["🔵 REFACTOR<br/>Clean up the code<br/>test stays green throughout"]
+    C --> A
+```
+
+This loop repeats for every new piece of behaviour — small, deliberate, one test at a time.
+
+**Why this order, and not the obvious "write code, then test it" order?** Writing the test first forces you to think about *how the code will be used* before you think about *how it will be implemented* — you're designing the interface from the caller's point of view. It also guarantees you never end up with untested code, because nothing gets written that didn't start as a failing test. TDD is a direct, disciplined answer to the "world without tests" problem from File 1: it makes untested code structurally impossible, because the test always comes first.
+
+---
+
+## 🗣️ BDD — Behaviour-Driven Development
+
+BDD builds on the same spirit as TDD, but shifts the *language* tests are written in, so that **non-technical stakeholders** — product owners, business analysts, QA — can read and even help write them. Instead of a test named `test_add_two_numbers`, BDD frames behaviour as a plain-language scenario, typically in **Given / When / Then** form:
+
+```
+Feature: Umbrella recommendation
+
+  Scenario: High chance of rain
+    Given tomorrow's forecast shows an 80% chance of rain
+    When the user checks whether to carry an umbrella
+    Then the app should recommend carrying one
+```
+
+This maps directly onto the AAA structure you already know — **Given = Arrange, When = Act, Then = Assert** — just written in a form a product manager can read and sign off on without knowing Python. Tools like `behave` (Python) or Cucumber (multi-language) let these plain-language scenarios be linked to real, executable test code underneath.
+
+**Where BDD fits in the pyramid:** because BDD scenarios describe *user-facing behaviour*, they tend to map most naturally onto the **acceptance testing** layer at the top of the pyramid — not a replacement for unit tests, but a complementary layer, written in language the whole team, not just engineers, can review and agree matches what the business actually wants.
+
+**TDD vs BDD, in one line:** TDD is about *how* you build code (test-first, at the unit level, driven by engineers). BDD is about *what language* you describe behaviour in (plain, shared, at the acceptance level, driven collaboratively with the business). They aren't competing ideas — many teams use TDD to drive the low-level unit tests, and BDD to drive the high-level acceptance tests, at the same time.
+
+---
+
 ## 🚀 Challenge Task
 
 Pick a feature from any project you've worked on. Write down, in one sentence each:
