@@ -88,11 +88,27 @@ flowchart LR
 
 ## 🔧 Hands-On Practice
 
+Two files, saved side by side — save as `flexbox-practice.html` and `flexbox-practice.css`:
+
 ```html
-<div class="header">
-  <div class="logo">Logo</div>
-  <div class="nav">Home | About | Contact</div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flexbox Practice</title>
+  <link rel="stylesheet" href="flexbox-practice.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Logo</div>
+    <div class="nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</body>
+</html>
 ```
 
 ```css
@@ -103,9 +119,20 @@ flowchart LR
   padding: 20px;
   background: #eee;
 }
+
+.logo {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.nav a {
+  margin-left: 16px;
+  text-decoration: none;
+  color: #333;
+}
 ```
 
-**✅ TRY THIS:** change `justify-content` to `center`, then `flex-start`, then `space-around`, and watch how the logo and nav text rearrange each time.
+**✅ TRY THIS, live in front of the room:** change `justify-content` to `center`, then `flex-start`, then `space-around`, and reload each time — watch how the logo and nav rearrange. Then change `align-items` from `center` to `flex-start` and resize the browser taller to show the vertical effect.
 
 ---
 

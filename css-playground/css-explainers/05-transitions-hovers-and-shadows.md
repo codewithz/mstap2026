@@ -107,13 +107,36 @@ flowchart LR
 
 ## 🔧 Hands-On Practice
 
+Two files, saved side by side — save as `polish-practice.html` and `polish-practice.css`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Polish Practice</title>
+  <link rel="stylesheet" href="polish-practice.css">
+</head>
+<body>
+  <button class="demo-btn">Hover me</button>
+</body>
+</html>
+```
+
 ```css
+body {
+  padding: 40px;
+  font-family: sans-serif;
+}
+
 .demo-btn {
   padding: 10px 20px;
   background: #26215C;
   color: white;
   border: none;
   border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -123,7 +146,7 @@ flowchart LR
 }
 ```
 
-**✅ TRY THIS:** change `0.15s` to `1s` and hover again — you'll feel exactly why fast transitions (`0.15s`–`0.3s`) feel responsive, while slow ones feel sluggish.
+**✅ TRY THIS, live in front of the room:** change `0.15s` to `1s` in `transition` and hover again — candidates will physically feel why fast transitions (`0.15s`–`0.3s`) feel responsive, while slow ones feel sluggish. Then remove the `transition` line entirely and hover once more to show the instant "jump cut" version for contrast.
 
 ---
 

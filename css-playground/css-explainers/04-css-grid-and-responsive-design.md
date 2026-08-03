@@ -81,11 +81,43 @@ flowchart LR
 
 ## 🔧 Hands-On Practice
 
+Two files, saved side by side — save as `grid-and-responsive-practice.html` and `grid-and-responsive-practice.css`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grid & Responsive Practice</title>
+  <link rel="stylesheet" href="grid-and-responsive-practice.css">
+</head>
+<body>
+  <div class="gallery">
+    <div>Item 1</div>
+    <div>Item 2</div>
+    <div>Item 3</div>
+    <div>Item 4</div>
+    <div>Item 5</div>
+  </div>
+</body>
+</html>
+```
+
 ```css
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
+  padding: 20px;
+}
+
+.gallery div {
+  background: #EEEDFE;
+  color: #26215C;
+  padding: 24px;
+  text-align: center;
+  border-radius: 8px;
+  font-weight: 500;
 }
 
 @media (max-width: 500px) {
@@ -95,7 +127,7 @@ flowchart LR
 }
 ```
 
-**✅ TRY THIS:** shrink your browser window slowly and watch the grid columns collapse one by one, then jump to a single column once you cross the `500px` breakpoint.
+**✅ TRY THIS, live in front of the room:** shrink the browser window slowly and watch the grid columns collapse one by one, then jump to a single column once you cross the `500px` breakpoint. Then change `minmax(150px, 1fr)` to `minmax(80px, 1fr)` and reload to show how the minimum size controls how aggressively columns pack in.
 
 ---
 

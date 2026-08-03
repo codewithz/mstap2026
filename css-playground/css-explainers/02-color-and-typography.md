@@ -112,6 +112,24 @@ p {
 
 ## 🔧 Hands-On Practice
 
+Two files, saved side by side — save as `colors-and-font-practice.html` and `colors-and-font-practice.css`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color & Typography Practice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="colors-and-font-practice.css">
+</head>
+<body>
+  <h1>Color & Typography Demo</h1>
+  <p>This paragraph uses the body font and color defined in :root. Change the variables in the CSS file and reload to see the whole page shift.</p>
+</body>
+</html>
+```
+
 ```css
 :root {
   --bg-color: #FAF7F2;
@@ -123,15 +141,22 @@ body {
   background-color: var(--bg-color);
   color: var(--body-color);
   font-family: 'Poppins', sans-serif;
+  padding: 40px;
 }
 
 h1 {
   color: var(--heading-color);
   font-family: 'Playfair Display', serif;
+  font-size: 32px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
 }
 ```
 
-**✅ TRY THIS:** swap `--bg-color` for three different hex values and watch the whole page shift mood — pale yellow feels cheerful, dark navy feels serious, soft pink feels playful.
+**✅ TRY THIS, live in front of the room:** change `--bg-color` to three different hex values one at a time and reload — pale yellow feels cheerful, dark navy feels serious, soft pink feels playful. Then swap `'Playfair Display'` for `'Georgia'` and ask candidates which pairing they prefer.
 
 ---
 
