@@ -2,18 +2,28 @@ Project context: Portfolio Manager training project. Sample REST API for dummy p
 https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker={TICKER}
 Supported tickers: C, AMZN, TSLA, FB, AAPL.
 
-Task: Design the UI for this portfolio manager.
+Task: Build a static UI skeleton only — no functionality yet. This is a design/layout pass to approve visuals before any JS logic is written.
+
+Scope for this pass:
+
+HTML + Tailwind CSS only
+Static/placeholder data (hardcoded sample holdings, sample chart shapes) — no API calls, no interactivity, no event handlers
+Just the structure, layout, spacing, typography, and color treatment for each screen
+Buttons and controls can be present visually but non-functional (no click handlers yet)
+
+Explicitly out of scope for now: JS logic, API integration, state management, add/remove functionality. That comes in a later pass once the design is approved.
 
 Design brief:
 
 Style: Linear-inspired minimalism (sharp, restrained, generous whitespace, disciplined typography) combined with Stripe-style data cards (clean card-based layout for holdings, gains/losses, small confident data visualizations)
 Color: purple-shaded palette, used sparingly as the single accent color — not decorative
-Stack: Vanilla JS + Tailwind CSS (for Claude Code to build)
+Stack: Vanilla JS + Tailwind CSS (JS to be added in a later pass)
 
 Process — please follow in order, no extra iterations:
 
 Propose the page/screen plan (what screens exist, what each contains) — no code yet
 Wait for my approval on the plan
-Once approved, write the full build prompt I can hand to Claude Code to generate the actual UI
+Once approved, build the static HTML/Tailwind skeleton only — no JS/functionality
+Wait for design approval before any JS/logic work begins
 
 Note: I'm low on tokens — keep the plan-stage response focused and skip exploratory back-and-forth.
