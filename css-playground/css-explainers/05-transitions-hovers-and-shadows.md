@@ -26,7 +26,21 @@ flowchart LR
     A["Mouse enters button"] --> B[":hover styles apply"]
     C["Mouse leaves button"] --> D["Default styles<br/>apply again"]
     B --> E["Instantly, unless<br/>a transition is set"]
+
+    classDef blue fill:#DCEEFB,stroke:#1971C2,stroke-width:2px,color:#0C447C
+    classDef amber fill:#FCEED3,stroke:#B5720A,stroke-width:2px,color:#633806
+    class A,B blue
+    class C,D,E amber
 ```
+
+Other common pseudo-classes work exactly the same way as `:hover`, just triggered by a different condition:
+
+| Pseudo-class | Triggered when |
+|---|---|
+| `:hover` | mouse is over the element |
+| `:focus` | element is selected (clicked into, or tabbed to via keyboard) |
+| `:active` | the exact moment the element is being clicked |
+| `:disabled` | a form element has the `disabled` attribute |
 
 ✅ **TRY THIS:** other common pseudo-classes include `:focus` (when a form element is selected via click or tab key) and `:active` (the exact moment something is being clicked).
 
@@ -99,9 +113,25 @@ A very common combo: lift a card slightly on hover using `transform`, paired wit
 flowchart LR
     A["0s: default state<br/>flat, soft shadow"] --> B["0.2s: hover state<br/>lifted, stronger shadow"]
     B -->|mouse leaves| A
+
+    classDef indigo fill:#E6E4FB,stroke:#5B52C4,stroke-width:2px,color:#26215C
+    class A,B indigo
 ```
 
 💡 **WHY:** small, subtle values (`4px` lift, `0.1` opacity shadow) read as tasteful polish. Large values (`50px` lift, solid black shadow) read as broken or excessive — restraint is the skill here.
+
+---
+
+## Part D — Best Places to Use Polish
+
+Polish effects are meant to be felt, not noticed — use them where they reinforce what's already interactive or important, not everywhere:
+
+- **Buttons and links** — a hover color change and subtle transition tells the user "this is clickable" before they even click
+- **Cards in a grid** — a gentle lift + shadow on hover signals the card can be clicked/expanded
+- **Form inputs** — a `:focus` border color change shows exactly which field is active
+- **Navigation items** — hover/active states help users track where they are
+
+⚠️ **GOTCHA:** avoid animating properties like `width`, `height`, `top`, or `left` for hover effects — they force the browser to recalculate layout on every frame, which can look janky. Stick to `transform` and `opacity` (and `background-color`/`box-shadow`, used sparingly) for smooth, cheap animations.
 
 ---
 
@@ -146,7 +176,7 @@ body {
 }
 ```
 
-**✅ TRY THIS, live in front of the room:** change `0.15s` to `1s` in `transition` and hover again — candidates will physically feel why fast transitions (`0.15s`–`0.3s`) feel responsive, while slow ones feel sluggish. Then remove the `transition` line entirely and hover once more to show the instant "jump cut" version for contrast.
+**✅ TRY THIS:** change `0.15s` to `1s` in `transition` and hover again — you'll physically feel why fast transitions (`0.15s`–`0.3s`) feel responsive, while slow ones feel sluggish. Then remove the `transition` line entirely and hover once more to see the instant "jump cut" version for contrast.
 
 ---
 
