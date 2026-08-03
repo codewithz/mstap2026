@@ -1,0 +1,19 @@
+Project context: Portfolio Manager training project. Sample REST API for dummy price data:
+https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker={TICKER}
+Supported tickers: C, AMZN, TSLA, FB, AAPL.
+
+Task: Design the UI for this portfolio manager.
+
+Design brief:
+
+Style: Linear-inspired minimalism (sharp, restrained, generous whitespace, disciplined typography) combined with Stripe-style data cards (clean card-based layout for holdings, gains/losses, small confident data visualizations)
+Color: purple-shaded palette, used sparingly as the single accent color — not decorative
+Stack: Vanilla JS + Tailwind CSS (for Claude Code to build)
+
+Process — please follow in order, no extra iterations:
+
+Propose the page/screen plan (what screens exist, what each contains) — no code yet
+Wait for my approval on the plan
+Once approved, write the full build prompt I can hand to Claude Code to generate the actual UI
+
+Note: I'm low on tokens — keep the plan-stage response focused and skip exploratory back-and-forth.
