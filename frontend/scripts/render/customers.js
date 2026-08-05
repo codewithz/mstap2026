@@ -25,7 +25,8 @@ function customerRowHtml(customer) {
             <td class="px-4 py-3">${branchBadge(customer.branch)}</td>
             <td class="px-4 py-3 text-right font-medium">${formatBalance(customer.balance ?? 0)}</td>
             <td class="px-4 py-3">
-                <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium edit-btn" data-id="${customer.id}">Edit</button>
+               <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium edit-btn" data-id="${customer.id}">Edit</button>
+    <button class="text-red-600 hover:text-red-800 text-sm font-medium delete-btn" data-id="${customer.id}">Delete</button>
             </td>
         </tr>`;
 }

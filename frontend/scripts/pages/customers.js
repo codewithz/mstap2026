@@ -1,5 +1,5 @@
 import { renderCustomerTable } from '../render/customers.js';
-import { getCustomers,createCustomer,updateCustomer } from '../api/customers.js';
+import { getCustomers,createCustomer,updateCustomer,deleteCustomer } from '../api/customers.js';
 const tbody = document.querySelector('#customer-table-body');
 
 async function loadAndRenderCustomers() {
@@ -59,11 +59,20 @@ function readFormValues(){
 // ONE listener on the tbody catches Edit clicks for every row,
 // including rows that didn't exist when the page first loaded
 tbody.addEventListener('click', async (event) => {
-    if (!event.target.classList.contains('edit-btn')) return;
     const id = Number(event.target.dataset.id);
-    const customers = await getCustomers();
-    const customer = customers.find(c => c.id === id);
-    if (customer) enterEditMode(customer);
+    if (!id) return;
+
+    if (event.target.classList.contains('edit-btn')) {
+        const customers = await getCustomers();
+        const customer = customers.find(c => c.id === id);
+        if (customer) enterEditMode(customer);
+    }
+
+    if (event.target.classList.contains('delete-btn')) {
+        if (!confirm(`Delete customer #${id}? This cannot be undone.`)) return;
+        await deleteCustomer(id);
+        await loadAndRenderCustomers();
+    }
 });
 
 form.addEventListener('submit', async (event) => {

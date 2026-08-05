@@ -11,3 +11,7 @@ export function createCustomer(customer){
 export function updateCustomer(id, updates) {
     return apiRequest(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(updates) });
 }
+
+export function deleteCustomer(id) {
+    return apiRequest(`/customers/${id}`, { method: 'DELETE' });
+}
