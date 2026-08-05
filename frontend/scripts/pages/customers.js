@@ -1,14 +1,14 @@
 import { renderCustomerTable } from '../render/customers.js';
-
+import { getCustomers,createCustomer } from '../api/customers.js';
 const tbody = document.querySelector('#customer-table-body');
 
 async function loadAndRenderCustomers() {
-    const response = await fetch('http://localhost:5050/api/customers');
-    const customers = await response.json();
+   
+    const customers = await getCustomers();
     renderCustomerTable(customers, tbody);
 }
 
-await loadAndRenderCustomers();
+
 
 const form= document.querySelector("#customer-form");
 const nameField= document.querySelector("#name");
@@ -31,7 +31,13 @@ function readFormValue(){
     };
 }
 
-form.addEventListener('submit',(event)=>{
+form.addEventListener('submit',async (event)=>{
         event.preventDefault();
-        console.log(readFormValue())
+        const values=readFormValue();
+        await createCustomer(values);
+        form.reset();
+        await loadAndRenderCustomers()
+
 });
+
+await loadAndRenderCustomers();
